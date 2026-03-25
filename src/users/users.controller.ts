@@ -9,7 +9,9 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
+
 import type { User } from './users.service';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,25 +22,23 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto): User {
+  create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
-  findAll(): User[] {
-    return this.usersService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): User {
-    return this.usersService.findOne(id);
+  findAll(
+    @Query('name') name?: string,
+    @Query('email') email?: string,
+  ): User[] {
+    return this.usersService.search(name, email);
   }
 
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
-  ): User {
+  ): Promise<User> {
     return this.usersService.update(id, updateUserDto);
   }
 
